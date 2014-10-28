@@ -273,69 +273,6 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
                 break
         return None
 
-def load_del_dic(path, encoding='utf-8'):
-    # mfd = os.open(path, os.O_RDONLY)
-    # data = mmap.mmap(mfd, 0, prot=mmap.PROT_READ)
-    with codecs.open(path, 'r+b') as f:
-        # memory-map the file, size 0 means whole file
-        mm = mmap.mmap(f.fileno(), 0)
-        lines = 6
-        words = []
-        for i in xrange(0,6):
-            print mm.readline()
-            print mm.tell()
-            # next_line = mm.find(u'\n')
-            # words.append(mm[mm.tell():next_line].decode('utf-8'))
-            # print words[i].encode('utf-8')
-            # mm.seek(next_line + 1)
-        # print mm.tell()
-        # print mm[mm.tell():mm.find(u'\n')]
-        # print mm[mm.tell():mm.find(u'\n')]
-
-
-
-
-
-
-
-        # print data.decode('utf-8'), type(data.decode('utf-8'))
-        # print 'line is <%s>' % mm.readline().strip().decode('utf-8')
-        # print 'line is <%s>' % mm.readline().strip().decode('utf-8')
-
-        # t = mm.readline()
-        # print t, type(t)
-        # print t.decode('utf-8').encode('utf-8')
-
-        # print mm.readline().strip()
-        # print mm.readline().strip()
-        # print mm.readline().strip()
-
-
-
-
-
-        # read content via standard file methods
-        # print mm.readline()  # prints "Hello Python!"
-        # read content via slice notation
-        # print mm[:5]  # prints "Hello"
-        # for i in xrange(0,50):
-        #     print mm[i]
-        # update content using slice notation;
-        # note that new content must have same size
-        # mm[6:] = " world!\n"
-        # ... and read again using standard file methods
-        # mm.seek(0)
-        # print mm.readline()  # prints "Hello  world!"
-        # close the map
-        mm.close()
-
-# def set_pointer_to_prev(mm):
-
-
-# @unibarrier
-# def get_entry(mm, ustr):
-
-
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
@@ -420,34 +357,10 @@ def native_semi_global_matrix(str1, str2, substitutionscore, insertscore,
 def native_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
                               deletescore=1, charmatrix={},
                               alignment_type='global'):
-    """A modified implenmentation of the Wagner-Fischer algorithm using
-    numpy. This should be used when an alignment is desired,
-    not only the edit distance."""
-
-    types = {'global': native_global_matrix,
-             'semi-global':native_semi_global_matrix}
-    matrix = types[alignment_type](str1, str2, substitutionscore, insertscore,
-                                   deletescore, charmatrix)
-
-    steps = initmatrix(len(str1)+1, len(str2)+1, defaultval='')
-    steps[0][1:] = list('i'*(len(str2)))
-    for idx in xrange(1, len(matrix)): steps[idx][0] = 'd'
-    for i in xrange(1, len(matrix)):
-        for j in xrange(1, len(matrix[0])):
-            c1 = str1[i-1]
-            c2 = str2[j-1]
-
-            scores = (('s', matrix[i-1][j-1] + charmatrix.get((c1, c2), substitutionscore)),
-                      ('i', matrix[i][j-1] + charmatrix.get((c1, c2), insertscore)),
-                      ('d', matrix[i-1][j] + charmatrix.get((c1, c2), deletescore)))
-            if str1[i-1] == str2[j-1]:
-                matrix[i][j] = matrix[i-1][j-1]
-                steps[i][j] = 'm'
-            else:
-                bestoption = min(scores, key=lambda x: x[1])
-                matrix[i][j] = bestoption[1]
-                steps[i][j] = bestoption[0]
-
+    
+    matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,
+                       insertscore=insertscore, deletescore=deletescore,
+                       charmatrix=charmatrix, alignment_type=alignment_type)
     return matrix, steps
 
 def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
@@ -462,6 +375,60 @@ def edit_distance(str1, str2, substitutionscore=1, insertscore=1,
     return m[-1][ -1]
 
 
+
+
+def full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
+                              deletescore=1, ins_func=None, iargs=[], ikwargs={},
+                              del_func=None, dargs=[], dkwargs={}, sub_func=None, sargs=[],
+                              skwargs={}, charmatrix={}, alignment_type='global'):
+    """
+    A version of the modified Wagner-Fischer algorithm that accepts user
+    defined scoreing functions. These functions should be of the form
+    fname(token1, token2, args*, kwargs**) and return an integer
+    >= 0. A return value of 0 indicates an optimality. The larger, the
+    integer, the worse the score. Charmatrix is here only used to
+    calulate default delete and insert scores for the initial matrix.
+    """
+
+    def dscore(c1, c2, default):
+        return charmatrix.get((c1, c2), default)
+    if ins_func is None:
+        ins_func = dscore
+        iargs = [insertscore]
+    if del_func is None:
+        del_func = dscore
+        dargs = [deletescore]
+    if sub_func is None:
+        sub_func = dscore
+        sargs = [substitutionscore]
+
+    types = {'global': native_global_matrix,
+             'semi-global':native_semi_global_matrix}
+    matrix = types[alignment_type](str1, str2, substitutionscore, insertscore,
+                                   deletescore, charmatrix)
+
+    steps = initmatrix(len(str1)+1, len(str2)+1, defaultval='')
+    steps[0][1:] = list('i'*(len(str2)))
+    for idx in xrange(1, len(matrix)): steps[idx][0] = 'd'
+    for i in xrange(1, len(matrix)):
+        for j in xrange(1, len(matrix[0])):
+            c1 = str1[i-1]
+            c2 = str2[j-1]
+
+            scores = (('s', matrix[i-1][j-1] + sub_func(c1, c2, *sargs, **skwargs)),
+                      ('i', matrix[i][j-1] + ins_func(c1, c2, *iargs, **ikwargs)),
+                      ('d', matrix[i-1][j] + del_func(c1, c2, *dargs, **dkwargs)))
+            if str1[i-1] == str2[j-1]:
+                matrix[i][j] = matrix[i-1][j-1]
+                steps[i][j] = 'm'
+            else:
+                bestoption = min(scores, key=lambda x: x[1])
+                matrix[i][j] = bestoption[1]
+                steps[i][j] = bestoption[0]
+
+    return matrix, steps
+
+        
 
 
 # ----------------------------------------------------------------------
@@ -693,10 +660,16 @@ def list_to_uni(l, encoding=u'utf-8'):
     result += u']'
     return result.encode(encoding)
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+    import sys
+    #full_edit_distance('ab', 'ac')
+    def f(c1, c2):
+        print 'the inner func'
+        return 1
 
-
-
+    #print full_edit_distance('ab', 'ac', ins_func=f, del_func=f, sub_func=f)
+    print full_edit_distance('ab', 'ac')
+    print _native_full_edit_distance('ab', 'ac')
 
 
 
