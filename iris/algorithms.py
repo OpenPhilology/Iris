@@ -143,48 +143,6 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
 
     return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
 
-@unibarrier
-def edits1(ustr, alphabet):
-   splits     = [(ustr[:i], ustr[i:]) for i in range(len(ustr) + 1)]
-   deletes    = [a + b[1:] for a, b in splits if b]
-   transposes = [a + b[1] + b[0] + b[2:] for a, b in splits if len(b)>1]
-   replaces   = [a + c + b[1:] for a, b in splits for c in alphabet if b]
-   inserts    = [a + c + b for a, b in splits for c in alphabet]
-   return set(deletes + transposes + replaces + inserts)
-
-@unibarrier
-def edits2(ustr, alphabet, dictionary):
-    return set(e2 for e1 in edits1(ustr, alphabet) for e2 in edits1(e1, alphabet) if e2 in dictionary)
-
-def known(words, dictionary):
-    return list(w for w in words if w in dictionary)
-
-@unibarrier
-def suggest(ustr, alphabet, dictionary):
-    suggestions = []
-    if ustr in dictionary:
-        suggestions.append(ustr)
-    suggestions.append(known(edits1(ustr) + edits2(ustr, alphabet, dictionary)))
-
-
-def load_lines(path, encoding='utf-8'):
-    with codecs.open(path, 'r', encoding) as f:
-        return [line for line in f]
-
-def count_lines(path):
-    """
-    Get the number of lines in a file by counting the newlines.
-    Use a call to wc so that extremely large files can be processed
-    quickly.
-    """
-    cmd = [u'wc', u'-l', path]
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                              stderr=subprocess.PIPE)
-
-    out, err = p.communicate()
-    return float(out.split(u' ', 1)[0])
-
-
 def prev_newline(mm, line_buffer_size=100):
     """
     Return the pointer position immediately after the closest left hand
