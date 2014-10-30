@@ -102,6 +102,12 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
 
     return list(suggestions if ret_count <= 0 else suggestions[:ret_count])
 
+
+@unibarrier
+def parse_del_dict_entry(entry):
+    return [] if entry is None else [word.strip() for word in entry.split(u' ')]
+    
+
 @unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     """
@@ -116,14 +122,15 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     subs = set()
 
     dels = strings_by_deletion(ustr, depth)
-    line_for_ustr = mmap_bin_search(ustr, del_dic_path, parse_del_dict_entry)
-    if line_for_ustr is not None:
-        inserts = set(w for w in line_for_ustr)  # get the words reachable by adding to ustr.
+    ustr_entry = mmap_bin_search(ustr, del_dic_path)
+    word_for_ustr = parse_del_dict_entry(ustr_entry)
+    if word_for_ustr is not None:
+        inserts = set(w for w in word_for_ustr)  # get the words reachable by adding to ustr.
     for s in dels:
         if s in dic:
             deletes.add(s) # Add a word reachable by deleting from ustr.
 
-        line_for_s = mmap_bin_search(s, del_dic_path, parse_del_dict_entry)
+        line_for_s = parse_del_dict_entry(mmap_bin_search(s, del_dic_path))
         if line_for_s is not None:
             # Get the words reachable by deleting from originals, adding to them.
             # Note that this is NOT the same as 'Levenshtein' substitution.
@@ -216,21 +223,22 @@ def truestring(unicode):
 # ----------------------------------------------------------------------
 
 @unibarrier
-def parse_del_dict_entry(entry):
+def key_for_del_dict_entry(entry):
     """
     Parse a line from a symmetric delete dictionary.
     Returns a tuple of the form (key, list of values).
     """
-    key, words = entry.split(u' : ')
-    return (key, [word.strip() for word in words.split(u' ')])
+    key, val = entry.split(u' : ')
+    return (key, val.strip())
 
 
 @unibarrier
-def parse_single_word(entry):
+def key_for_single_word(entry):
     """
     Parse a line from a simple "one word per line" dictionary.
     """
-    return (entry, entry)
+    cleanword = entry.strip()
+    return (cleanword, cleanword)
 
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
@@ -239,7 +247,7 @@ def parse_single_word(entry):
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 @unibarrier
-def mmap_bin_search(ustr, dictionary_path, entryparser_fn=parse_del_dict_entry, line_buffer_size=200):
+def mmap_bin_search(ustr, dictionary_path, entryparser_fn=key_for_del_dict_entry, line_buffer_size=200):
     """
     Perform a binary search on a memory mapped dictionary file, and
     return the parsed entry, or None if the specified entry cannot be
@@ -271,11 +279,12 @@ def mmap_bin_search(ustr, dictionary_path, entryparser_fn=parse_del_dict_entry, 
             mid = imin + int(math.floor((imax - imin)/2))
             mm.seek(mid)
             mm.seek(prev_newline(mm))
-            entry = current_entry(mm)
-            key = entry[0]
+            thing = current_entry(mm)
+            key, entry = thing
+            # key, entry = current_entry(mm)
 
             if key == ustr:
-                return entry[1]
+                return entry
             elif key < ustr:
                 imin = mid + 1
             else:
