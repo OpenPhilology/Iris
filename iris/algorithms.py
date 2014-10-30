@@ -80,18 +80,6 @@ def strings_by_deletion(unistr, dels):
         new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
     return sorted(list(new_words))
 
-
-
-def load_sym_dict(path):
-    path = os.path.abspath(os.path.expanduser(path))
-    dic = {}
-    with codecs.open(path, encoding='utf-8') as dfile:
-        for line in dfile:
-            word, dels = line.split(u' : ')
-            dic[word] = [s.strip(u'\n') for s in dels.split(u' ')]
-
-    return dic
-
 @unibarrier
 def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
     """

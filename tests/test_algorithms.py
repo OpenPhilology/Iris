@@ -1065,21 +1065,6 @@ class SymSpellTests(unittest.TestCase):
         self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic, delete_dic, 1))
         self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic, delete_dic, 1))
 
-    def test_load_sym_dict(self):
-        """
-        Tests that the load_sym_dict function correctly loads into a
-        python dictionary object.
-        """
-        df = tempfile.NamedTemporaryFile()
-        df.write(u'word : ord wod wor wrd\n')
-        df.write(u'tree : ree tee tre\n')
-        df.seek(0,0)
-        actual = algorithms.load_sym_dict(os.path.abspath(df.name))
-        expected = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
-               u'tree':[u'ree', u'tee', u'tre']}
-        self.assertEqual(expected, actual)
-        df.close()
-
     def test_string_compare(self):
         """
         Test the string comparison function.
