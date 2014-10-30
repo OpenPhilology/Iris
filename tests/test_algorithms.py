@@ -1132,7 +1132,7 @@ class SymSpellTests(unittest.TestCase):
             self.assertEqual(26, algorithms.prev_newline(mm, 50))
         df.close()
 
-    def test_delete_dict_line_parser(self):
+    def test_parse_delete_dict_entry(self):
         """
         Tests the parse_del_dict_entry function.
         """
@@ -1142,6 +1142,18 @@ class SymSpellTests(unittest.TestCase):
                          algorithms.parse_del_dict_entry(single_entry))
         self.assertEqual((u'key', [u'val1', u'val2', u'val3']),
                          algorithms.parse_del_dict_entry(multiple_entries))
+
+    def test_parse_single_word(self):
+        """
+        Tests the test_parse_single_word function.
+        """
+        w1 = u'word1'
+        w2 = u'word2'
+        w3 = u'word3'
+        self.assertEqual((u'word1', u'word1'), algorithms.parse_single_word(w1))
+        self.assertEqual((u'word2', u'word2'), algorithms.parse_single_word(w2))
+        self.assertEqual((u'word3', u'word3'), algorithms.parse_single_word(w3))
+
 
     def test_mmap_bin_search_single(self):
         """

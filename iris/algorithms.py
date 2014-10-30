@@ -251,6 +251,8 @@ def mmap_bin_search(ustr, dictionary_path, entryparser_fn=parse_del_dict_entry, 
     form fn_name(unicodestr), decorated with @unibarrier and return a
     tuple of the form (keytosort by, val). By default, it uses the
     function for parsing symmetric deletion dictionary entries.
+    The line_buffer_size argument must be >= the longest line in the
+    dictionary, or behavior is undefined.
     """
 
     def current_entry(mm):
