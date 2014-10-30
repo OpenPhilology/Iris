@@ -80,14 +80,7 @@ def strings_by_deletion(unistr, dels):
         new_words.add(u''.join((c for i, c in enumerate(unistr) if i not in comb)))
     return sorted(list(new_words))
 
-@unibarrier
-def parse_sym_entry(entry):
-    """
-    Parse a line from a symmetric delete dictionary into a python data
-    structure. Returns a tuple of the form (key, list of values).
-    """
-    key, words = entry.split(u' : ')
-    return (key, [word.strip() for word in words.split(u' ')])
+
 
 def load_sym_dict(path):
     path = os.path.abspath(os.path.expanduser(path))
@@ -135,18 +128,18 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     subs = set()
 
     dels = strings_by_deletion(ustr, depth)
-    line_for_ustr = deldict_bin_search(ustr, del_dic_path)
+    line_for_ustr = mmap_bin_search(ustr, del_dic_path, parse_del_dict_entry)
     if line_for_ustr is not None:
-        inserts = set(w for w in line_for_ustr[1])  # get the words reachable by adding to ustr.
+        inserts = set(w for w in line_for_ustr)  # get the words reachable by adding to ustr.
     for s in dels:
         if s in dic:
             deletes.add(s) # Add a word reachable by deleting from ustr.
 
-        line_for_s = deldict_bin_search(s, del_dic_path)
+        line_for_s = mmap_bin_search(s, del_dic_path, parse_del_dict_entry)
         if line_for_s is not None:
             # Get the words reachable by deleting from originals, adding to them.
             # Note that this is NOT the same as 'Levenshtein' substitution.
-            for sug in line_for_s[1]:
+            for sug in line_for_s:
                 distance = edit_distance(sug, ustr)
                 if distance == depth:
                     subs.add(sug)
@@ -229,24 +222,54 @@ def truestring(unicode):
     out = u'<' + u':'.join([u for u in unicode]) + u'>'
     return out
 
+
+# ----------------------------------------------------------------------
+# Binary search dictionary entry parsers -------------------------------
+# ----------------------------------------------------------------------
+
+@unibarrier
+def parse_del_dict_entry(entry):
+    """
+    Parse a line from a symmetric delete dictionary.
+    Returns a tuple of the form (key, list of values).
+    """
+    key, words = entry.split(u' : ')
+    return (key, [word.strip() for word in words.split(u' ')])
+
+
+@unibarrier
+def parse_single_word(entry):
+    """
+    Parse a line from a simple "one word per line" dictionary.
+    """
+    return (entry, entry)
+
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+# ----------------------------------------------------------------------
+ 
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 @unibarrier
-def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
+def mmap_bin_search(ustr, dictionary_path, entryparser_fn=parse_del_dict_entry, line_buffer_size=200):
     """
     Perform a binary search on a memory mapped dictionary file, and
     return the parsed entry, or None if the specified entry cannot be
     found. This function assumes that the dictionary is properly
     formatted and well-formed, otherwise the behavior is undefined.
     Line buffer must not be shorter than the longest line in the
-    dictionary.
+    dictionary. Entries may be any strings which do not contain newlines
+    (newlines delimint entries); the entryparser_fn should be of the
+    form fn_name(unicodestr), decorated with @unibarrier and return a
+    tuple of the form (keytosort by, val). By default, it uses the
+    function for parsing symmetric deletion dictionary entries.
     """
 
-    def current_key(mm):
+    def current_entry(mm):
         start = mm.tell()
         rawline = mm.readline()
         mm.seek(start)
-        return parse_sym_entry(rawline.decode(u'utf-8'))
+        return entryparser_fn(rawline.decode(u'utf-8'))
 
     with codecs.open(dictionary_path, 'r+b') as f:
         # memory-map the file, size 0 means whole file
@@ -258,11 +281,11 @@ def deldict_bin_search(ustr, dictionary_path, line_buffer_size=200):
             mid = imin + int(math.floor((imax - imin)/2))
             mm.seek(mid)
             mm.seek(prev_newline(mm))
-            parsedline = current_key(mm)
-            key = parsedline[0]
+            entry = current_entry(mm)
+            key = entry[0]
 
             if key == ustr:
-                return parsedline
+                return entry[1]
             elif key < ustr:
                 imin = mid + 1
             else:
