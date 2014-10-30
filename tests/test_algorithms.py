@@ -984,261 +984,261 @@ class LanguageTests(unittest.TestCase):
 # Symmetric spell check tests ------------------------------------------
 # ----------------------------------------------------------------------
 
-# class SymSpellTests(unittest.TestCase):
-#     def test_strings_by_deletion_1(self):
-#         """
-#         Test the strings_by_deletion function with one delete.
-#         """
-#         expected = [u'abcd', u'abce', u'abde', u'acde', u'bcde']
-#         self.assertEqual(expected, algorithms.strings_by_deletion(u'abcde', 1))
+class SymSpellTests(unittest.TestCase):
+    def test_strings_by_deletion_1(self):
+        """
+        Test the strings_by_deletion function with one delete.
+        """
+        expected = [u'abcd', u'abce', u'abde', u'acde', u'bcde']
+        self.assertEqual(expected, algorithms.strings_by_deletion(u'abcde', 1))
 
-#     def test_strings_by_deletion_2(self):
-#         """
-#         Test the strings_by_deletion function with two deletes.
-#         """
-#         expected = [u'a', u'e', u'p']
-#         self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2))
+    def test_strings_by_deletion_2(self):
+        """
+        Test the strings_by_deletion function with two deletes.
+        """
+        expected = [u'a', u'e', u'p']
+        self.assertEqual(expected, algorithms.strings_by_deletion(u'ape', 2))
 
-#     def test_strings_bzy_deletion_exceed(self):
-#         """
-#         Test the strings_by_deletion function where the number of
-#         deletes exceeds characters in the string.
-#         """
-#         self.assertEqual([], algorithms.strings_by_deletion(u'aaa', 10))
+    def test_strings_bzy_deletion_exceed(self):
+        """
+        Test the strings_by_deletion function where the number of
+        deletes exceeds characters in the string.
+        """
+        self.assertEqual([], algorithms.strings_by_deletion(u'aaa', 10))
 
-#     def test_sym_suggest_already_word(self):
-#         """
-#         Test sym_suggest in the case where the specified string is
-#         already a word in the dictionary.
-#         """
-#         delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
-#                       u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
-#         dic = {u'tree', u'word'}
+    def test_sym_suggest_already_word(self):
+        """
+        Test sym_suggest in the case where the specified string is
+        already a word in the dictionary.
+        """
+        delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
+                      u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
+        dic = {u'tree', u'word'}
 
-#         # delete_dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
-#         #        u'tree':[u'ree', u'tee', u'tre']}
+        # delete_dic = {u'word':[u'ord', u'wod', u'wor', u'wrd'],
+        #        u'tree':[u'ree', u'tee', u'tre']}
 
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'word', dic, delete_dic, 1))
-#         self.assertEqual([u'tree'], algorithms.sym_suggest(u'tree', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'word', dic, delete_dic, 1))
+        self.assertEqual([u'tree'], algorithms.sym_suggest(u'tree', dic, delete_dic, 1))
 
-#     def test_sym_suggest_single_delete(self):
-#         """
-#         Test sym_suggest where the string differs from words by a
-#         single delete.
-#         """
-#         delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
-#                       u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
-#         dic = {u'tree', u'word'}
+    def test_sym_suggest_single_delete(self):
+        """
+        Test sym_suggest where the string differs from words by a
+        single delete.
+        """
+        delete_dic = {u'ord':[u'word'], u'wod':[u'word'], u'wor':[u'word'], u'wrd':[u'word'],
+                      u'ree':[u'tree'], u'tee':[u'tree'], u'tre':[u'tree']}
+        dic = {u'tree', u'word'}
 
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'ord', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wod', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wor', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wrd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'ord', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wod', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wor', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wrd', dic, delete_dic, 1))
 
-#     def test_sym_suggest_single_insert(self):
-#         """
-#         Test sym_suggest where the string differs from words by a single
-#         insert.
-#         """
-#         delete_dic = {u'Xword':[u'word'], u'wXord':[u'word'], u'woXrd':[u'word'], u'worXd':[u'word'], u'wordX':[u'word'],
-#                       u'Xtree':[u'tree']}
-#         dic = {u'tree', u'word'}
+    def test_sym_suggest_single_insert(self):
+        """
+        Test sym_suggest where the string differs from words by a single
+        insert.
+        """
+        delete_dic = {u'Xword':[u'word'], u'wXord':[u'word'], u'woXrd':[u'word'], u'worXd':[u'word'], u'wordX':[u'word'],
+                      u'Xtree':[u'tree']}
+        dic = {u'tree', u'word'}
 
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'Xword', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wXord', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'woXrd', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'worXd', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wordX', dic, delete_dic, 1))
-#         self.assertEqual([u'tree'], algorithms.sym_suggest(u'Xtree', dic, delete_dic, 1))
-
-
-#     def test_sym_suggest_single_substitution(self):
-#         """
-#         Test sym_suggest where the string differs from words by a single
-#         insert.
-#         """
-#         delete_dic = {u'Word':[u'word'], u'wOrd':[u'word'], u'woRd':[u'word'], u'worD':[u'word']}
-#         dic = {u'word'}
-
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'Word', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'wOrd', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic, delete_dic, 1))
-#         self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic, delete_dic, 1))
-
-#     def test_string_compare(self):
-#         """
-#         Test the string comparison function.
-#         """
-#         self.assertEqual(1, algorithms.compare_strings(u'a', u'b'))
-#         self.assertEqual(-1, algorithms.compare_strings(u'b', u'a'))
-#         self.assertEqual(0, algorithms.compare_strings(u'a', u'a'))
-#         self.assertEqual(1, algorithms.compare_strings(u'a', u'aaaaa'))
-#         self.assertEqual(-1, algorithms.compare_strings(u'aaaaa', u'a'))
-
-#     def test_previous_newline_no_newline(self):
-#         """
-#         Test the previous newline function when it should move to the
-#         beginning of the file.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write(u'abc')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             mm = mmap.mmap(f.fileno(), 0)
-#             self.assertEqual(0, algorithms.prev_newline(mm, 50))
-#         df.close()
-
-#     def test_previous_newline_single_overflow(self):
-#         """
-#         Test the previous newline function.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write(u'abc\ndef')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             mm = mmap.mmap(f.fileno(), 0)
-#             # Test the points to the left of the newline character
-#             mm.seek(0)
-#             self.assertEqual(0, algorithms.prev_newline(mm, 50))
-#             mm.seek(1)
-#             self.assertEqual(0, algorithms.prev_newline(mm, 50))
-#             mm.seek(2)
-#             self.assertEqual(0, algorithms.prev_newline(mm, 50))
-#             mm.seek(3)
-#             self.assertEqual(0, algorithms.prev_newline(mm, 50))
-
-#             # Test the points to the right of the newline character
-#             mm.seek(4)
-#             self.assertEqual(4, algorithms.prev_newline(mm, 50))
-#             mm.seek(5)
-#             self.assertEqual(4, algorithms.prev_newline(mm, 50))
-#             mm.seek(6)
-#             self.assertEqual(4, algorithms.prev_newline(mm, 50))
-#             mm.seek(7)
-#             self.assertEqual(4, algorithms.prev_newline(mm, 50))
-#         df.close()
-
-#     def test_previous_newline_multiple_left(self):
-#         """
-#         Test the prev_newline function when it would pass several
-#         newlines.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write(u'abcde\nfghijk\nlmnopq\nrstuv\nwxyz')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             mm = mmap.mmap(f.fileno(), 0)
-#             mm.seek(30)
-#             self.assertEqual(26, algorithms.prev_newline(mm, 50))
-#         df.close()
-
-#     def test_key_for_delete_dict_entry(self):
-#         """
-#         Tests the key_for_del_dict_entry function.
-#         """
-#         single_entry = u'key : val1'
-#         multiple_entries = u'key : val1 val2 val3'
-#         self.assertEqual((u'key', u'val1'),
-#                          algorithms.key_for_del_dict_entry(single_entry))
-#         self.assertEqual((u'key', u'val1 val2 val3'),
-#                              algorithms.key_for_del_dict_entry(multiple_entries))
-
-#     def test_key_for_single_word(self):
-#         """
-#         Tests the test_key_for_single_word function.
-#         """
-#         w1 = u'word1'
-#         w2 = u'word2'
-#         w3 = u'word3'
-#         self.assertEqual((u'word1', u'word1'), algorithms.key_for_single_word(w1))
-#         self.assertEqual((u'word2', u'word2'), algorithms.key_for_single_word(w2))
-#         self.assertEqual((u'word3', u'word3'), algorithms.key_for_single_word(w3))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'Xword', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wXord', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'woXrd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'worXd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wordX', dic, delete_dic, 1))
+        self.assertEqual([u'tree'], algorithms.sym_suggest(u'Xtree', dic, delete_dic, 1))
 
 
-#     def test_mmap_bin_search_single(self):
-#         """
-#         Tests the mmap_bin_search algorithm with a dictionary with
-#         one item.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write(u'only_entry : some_value')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             mm = mmap.mmap(f.fileno(), 0)
-#             expected = u'some_value'
-#             dpath = os.path.abspath(df.name).decode(u'utf-8')
-#             self.assertEqual(expected,
-#                              algorithms.mmap_bin_search(u'only_entry', dpath))
+    def test_sym_suggest_single_substitution(self):
+        """
+        Test sym_suggest where the string differs from words by a single
+        insert.
+        """
+        delete_dic = {u'Word':[u'word'], u'wOrd':[u'word'], u'woRd':[u'word'], u'worD':[u'word']}
+        dic = {u'word'}
 
-#     def test_mmap_bin_search_double(self):
-#         """
-#         Tests the mmap_bin_search algorithm with a dictionary with
-#         two items.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write(u'first_key : first_value\n')
-#         df.write(u'second_key : second_value')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             mm = mmap.mmap(f.fileno(), 0)
-#             expected_first = u'first_value'
-#             expected_second = u'second_value'
-#             dpath = os.path.abspath(df.name).decode(u'utf-8')
-#             self.assertEqual(expected_first,
-#                              algorithms.mmap_bin_search(u'first_key', dpath))
-#             self.assertEqual(expected_second,
-#                              algorithms.mmap_bin_search(u'second_key', dpath))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'Word', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'wOrd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'woRd', dic, delete_dic, 1))
+        self.assertEqual([u'word'], algorithms.sym_suggest(u'worD', dic, delete_dic, 1))
 
-#     def test_mmap_bin_search_general(self):
-#         """
-#         Test the mmap_bin_search function in a general case.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write('akey : aval\n')
-#         df.write('bkey : bval\n')
-#         df.write('ckey : cval\n')
-#         df.write('dkey : dval\n')
-#         df.write('ekey : eval\n')
-#         df.write('fkey : fval\n')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             dpath = os.path.abspath(df.name).decode(u'utf-8')
-#             ex_a = u'aval'
-#             ex_b = u'bval'
-#             ex_c = u'cval'
-#             ex_d = u'dval'
-#             ex_e = u'eval'
-#             ex_f = u'fval'
-#             self.assertEqual(ex_a, algorithms.mmap_bin_search(u'akey', dpath))
-#             self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bkey', dpath))
-#             self.assertEqual(ex_c, algorithms.mmap_bin_search(u'ckey', dpath))
-#             self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dkey', dpath))
-#             self.assertEqual(ex_e, algorithms.mmap_bin_search(u'ekey', dpath))
-#             self.assertEqual(ex_f, algorithms.mmap_bin_search(u'fkey', dpath))
-#             self.assertEqual(None, algorithms.mmap_bin_search(u'gkey', dpath))
+    def test_string_compare(self):
+        """
+        Test the string comparison function.
+        """
+        self.assertEqual(1, algorithms.compare_strings(u'a', u'b'))
+        self.assertEqual(-1, algorithms.compare_strings(u'b', u'a'))
+        self.assertEqual(0, algorithms.compare_strings(u'a', u'a'))
+        self.assertEqual(1, algorithms.compare_strings(u'a', u'aaaaa'))
+        self.assertEqual(-1, algorithms.compare_strings(u'aaaaa', u'a'))
+
+    def test_previous_newline_no_newline(self):
+        """
+        Test the previous newline function when it should move to the
+        beginning of the file.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abc')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+        df.close()
+
+    def test_previous_newline_single_overflow(self):
+        """
+        Test the previous newline function.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abc\ndef')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            # Test the points to the left of the newline character
+            mm.seek(0)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(1)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(2)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+            mm.seek(3)
+            self.assertEqual(0, algorithms.prev_newline(mm, 50))
+
+            # Test the points to the right of the newline character
+            mm.seek(4)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(5)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(6)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+            mm.seek(7)
+            self.assertEqual(4, algorithms.prev_newline(mm, 50))
+        df.close()
+
+    def test_previous_newline_multiple_left(self):
+        """
+        Test the prev_newline function when it would pass several
+        newlines.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'abcde\nfghijk\nlmnopq\nrstuv\nwxyz')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            mm.seek(30)
+            self.assertEqual(26, algorithms.prev_newline(mm, 50))
+        df.close()
+
+    def test_key_for_delete_dict_entry(self):
+        """
+        Tests the key_for_del_dict_entry function.
+        """
+        single_entry = u'key : val1'
+        multiple_entries = u'key : val1 val2 val3'
+        self.assertEqual((u'key', u'val1'),
+                         algorithms.key_for_del_dict_entry(single_entry))
+        self.assertEqual((u'key', u'val1 val2 val3'),
+                             algorithms.key_for_del_dict_entry(multiple_entries))
+
+    def test_key_for_single_word(self):
+        """
+        Tests the test_key_for_single_word function.
+        """
+        w1 = u'word1'
+        w2 = u'word2'
+        w3 = u'word3'
+        self.assertEqual((u'word1', u'word1'), algorithms.key_for_single_word(w1))
+        self.assertEqual((u'word2', u'word2'), algorithms.key_for_single_word(w2))
+        self.assertEqual((u'word3', u'word3'), algorithms.key_for_single_word(w3))
 
 
-#     def test_mmap_simple_single_word(self):
-#         """
-#         Test the mmap_bin_search function for accessing words from a
-#         simple word-per-line dictionary.
-#         """
-#         df = tempfile.NamedTemporaryFile()
-#         df.write('aval\n')
-#         df.write('bval\n')
-#         df.write('cval\n')
-#         df.write('dval\n')
-#         df.seek(0,0)
-#         with open(os.path.abspath(df.name), 'r+b') as f:
-#             dpath = os.path.abspath(df.name).decode(u'utf-8')
-#             ex_a = u'aval'
-#             ex_b = u'bval'
-#             ex_c = u'cval'
-#             ex_d = u'dval'
-#             self.assertEqual(ex_a, algorithms.mmap_bin_search(u'aval', dpath, entryparser_fn=algorithms.key_for_single_word))
-#             self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bval', dpath, entryparser_fn=algorithms.key_for_single_word))
-#             self.assertEqual(ex_c, algorithms.mmap_bin_search(u'cval', dpath, entryparser_fn=algorithms.key_for_single_word))
-#             self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dval', dpath, entryparser_fn=algorithms.key_for_single_word))
+    def test_mmap_bin_search_single(self):
+        """
+        Tests the mmap_bin_search algorithm with a dictionary with
+        one item.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'only_entry : some_value')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            expected = u'some_value'
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            self.assertEqual(expected,
+                             algorithms.mmap_bin_search(u'only_entry', dpath))
+
+    def test_mmap_bin_search_double(self):
+        """
+        Tests the mmap_bin_search algorithm with a dictionary with
+        two items.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write(u'first_key : first_value\n')
+        df.write(u'second_key : second_value')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            mm = mmap.mmap(f.fileno(), 0)
+            expected_first = u'first_value'
+            expected_second = u'second_value'
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            self.assertEqual(expected_first,
+                             algorithms.mmap_bin_search(u'first_key', dpath))
+            self.assertEqual(expected_second,
+                             algorithms.mmap_bin_search(u'second_key', dpath))
+
+    def test_mmap_bin_search_general(self):
+        """
+        Test the mmap_bin_search function in a general case.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write('akey : aval\n')
+        df.write('bkey : bval\n')
+        df.write('ckey : cval\n')
+        df.write('dkey : dval\n')
+        df.write('ekey : eval\n')
+        df.write('fkey : fval\n')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            ex_a = u'aval'
+            ex_b = u'bval'
+            ex_c = u'cval'
+            ex_d = u'dval'
+            ex_e = u'eval'
+            ex_f = u'fval'
+            self.assertEqual(ex_a, algorithms.mmap_bin_search(u'akey', dpath))
+            self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bkey', dpath))
+            self.assertEqual(ex_c, algorithms.mmap_bin_search(u'ckey', dpath))
+            self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dkey', dpath))
+            self.assertEqual(ex_e, algorithms.mmap_bin_search(u'ekey', dpath))
+            self.assertEqual(ex_f, algorithms.mmap_bin_search(u'fkey', dpath))
+            self.assertEqual(None, algorithms.mmap_bin_search(u'gkey', dpath))
+
+
+    def test_mmap_simple_single_word(self):
+        """
+        Test the mmap_bin_search function for accessing words from a
+        simple word-per-line dictionary.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write('aval\n')
+        df.write('bval\n')
+        df.write('cval\n')
+        df.write('dval\n')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            ex_a = u'aval'
+            ex_b = u'bval'
+            ex_c = u'cval'
+            ex_d = u'dval'
+            self.assertEqual(ex_a, algorithms.mmap_bin_search(u'aval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_b, algorithms.mmap_bin_search(u'bval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_c, algorithms.mmap_bin_search(u'cval', dpath, entryparser_fn=algorithms.key_for_single_word))
+            self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dval', dpath, entryparser_fn=algorithms.key_for_single_word))
 
                 
 class SpellCheckTests(unittest.TestCase):
