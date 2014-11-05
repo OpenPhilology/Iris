@@ -2,6 +2,7 @@
 import unittest
 import os
 import tempfile
+import shutil
 from iris import lex
 
 class DictTests(unittest.TestCase):
@@ -10,16 +11,22 @@ class DictTests(unittest.TestCase):
     """
 
     def setUp(self):
+        #Make a temp sample dictionary
         self.temp = tempfile.NamedTemporaryFile()
         self.temp.write(u'word1\n'.encode(u'utf-8'))
         self.temp.write(u'word2\n'.encode(u'utf-8'))
         self.temp.write(u'αχιλλεύς\n'.encode(u'utf-8')) #Achilles, in NFD
         self.temp.write(u'αχιλλεύς\n'.encode(u'utf-8')) #Achilles, in NFD
         self.temp.seek(0, 0)
-        self.path = os.path.abspath(self.temp.name)
+        self.path = os.path.abspath(self.temp.name).decode(u'utf-8')
+
+        #Make an empty temp directory for general use
+        self.tempdir = tempfile.mkdtemp().decode('utf-8')
 
     def tearDown(self):
         self.temp.close()
+        shutil.rmtree(self.tempdir)
+
 
     def test_cleanlines(self):
         """
@@ -58,39 +65,40 @@ class DictTests(unittest.TestCase):
         expected = set([u'adding', u'a', u'line', u'with', u'multiple', u'words',
                     u'another', u'with',  u'Greek', u'αχιλλεύς', u'and',
                     u'some', u'NFC', u'αχιλλεύς'])
-        self.assertEqual(lex.cleanuniquewords(self.temp1.name), expected)
+        self.assertEqual(lex.cleanuniquewords(self.temp1.name.decode(u'utf-8')), expected)
 
     def test_words_from_files(self):
         """
         Test the words_from_files function.
         """
-        dirpath = tempfile.mkdtemp()
-        self.temp1 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.temp2 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.temp3 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.dirtofilter = tempfile.mkdtemp(dir=dirpath) #To be filtered out
+        self.temp1 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.temp2 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.temp3 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.dirtofilter = tempfile.mkdtemp(dir=self.tempdir) #To be filtered out
         self.temp1.write(u'a')
         self.temp2.write(u'b')
         self.temp3.write(u'c')
         self.temp1.seek(0, 0)
         self.temp2.seek(0, 0)
         self.temp3.seek(0, 0)
-        words = lex.words_from_files(dirpath)
+        words = lex.words_from_files(self.tempdir)
         self.assertEqual(3, len(words))
         self.assertTrue(u'a' in words)
         self.assertTrue(u'b' in words)
         self.assertTrue(u'c' in words)
+        self.temp1.close()
+        self.temp2.close()
+        self.temp3.close()
 
     def test_unique_words_from_files(self):
         """
         Test the words_from_files_function.
         """
-        dirpath = tempfile.mkdtemp()
-        self.temp1 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.temp2 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.temp3 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.temp4 = tempfile.NamedTemporaryFile(dir=dirpath)
-        self.dirtofilter = tempfile.mkdtemp(dir=dirpath) #To be filtered out
+        self.temp1 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.temp2 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.temp3 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.temp4 = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        self.dirtofilter = tempfile.mkdtemp(dir=self.tempdir) #To be filtered out
         self.temp1.write(u'a')
         self.temp2.write(u'b b')
         self.temp3.write(u'c a')
@@ -99,13 +107,32 @@ class DictTests(unittest.TestCase):
         self.temp2.seek(0, 0)
         self.temp3.seek(0, 0)
         self.temp4.seek(0, 0)
-        words = lex.unique_words_from_files(dirpath)
+        words = lex.unique_words_from_files(self.tempdir)
         self.assertEqual(4, len(words))
         self.assertTrue(u'a' in words)
         self.assertTrue(u'b' in words)
-        self.assertTrue(u'c' in words)        
-        self.assertTrue(u'd' in words)        
+        self.assertTrue(u'c' in words)
+        self.assertTrue(u'd' in words)
+        self.temp1.close()
+        self.temp2.close()
+        self.temp3.close()
+        self.temp4.close()
 
+    def test_make_dict(self):
+        """
+        Test the make_dict function.
+        """
+        words = [u'a', u'b', u'c', u'd']
+        mytemp = tempfile.mkdtemp().decode('utf-8')
+        outpath = os.path.join(mytemp, u'testdict')
+        lex.make_dict(outpath, words)
+        retrived = lex.cleanuniquewords(outpath)
+        self.assertEqual(len(retrived), 4)
+        self.assertTrue(u'a' in retrived)
+        self.assertTrue(u'b' in retrived)
+        self.assertTrue(u'c' in retrived)
+        self.assertTrue(u'd' in retrived)
+        shutil.rmtree(mytemp)
 
 
 if __name__ == '__main__':
