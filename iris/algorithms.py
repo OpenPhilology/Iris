@@ -611,6 +611,7 @@ def greek_chars():
     chars += uniblock(combining_diacritical_mark_range[1], combining_diacritical_mark_range[2])
     return chars
 
+@unibarrier
 def greek_filter(string):
     """
     Remove all non-Greek characters from a string.
