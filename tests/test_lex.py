@@ -135,5 +135,22 @@ class DictTests(unittest.TestCase):
         shutil.rmtree(mytemp)
 
 
+    def test_make_deldict_1(self):
+        """
+        Test the make_deldict function at depth 1.
+        """
+        outfile = tempfile.NamedTemporaryFile(dir=self.tempdir, delete=True)
+        words = [u'aaa', u'bbb', u'ccc', u'ddd']
+        lex.make_deldict(outfile.name, words, 1)
+        lines = lex.cleanlines(outfile.name)
+        self.assertEqual(u'aa : aaa', lines[0])
+        self.assertEqual(u'bb : bbb', lines[1])
+        self.assertEqual(u'cc : ccc', lines[2])
+        self.assertEqual(u'dd : ddd', lines[3])
+        outfile.close()
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -74,3 +74,24 @@ def make_dict(outpath, iterable, encoding=u'utf-8'):
 	with codecs.open(outpath, u'w+', encoding=encoding) as f:
 		for s in iterable:
 			f.write(s + u'\n')
+
+@alg.unibarrier
+def make_deldict(outpath, words, depth):
+    """
+    Creates a symmetric deletion dictionary from the specified word list.
+    WARNING! This is a naive approach, which requires all the variants to be stored in
+    memory. For large dictionaries at higher depth, this can easily use all
+    available memory on most machines.
+    """
+    variant_dict = {}
+    for word in words:
+        for var in alg.strings_by_deletion(word, depth):
+            if var not in variant_dict:
+                variant_dict[var] = []
+            variant_dict[var].append(word)
+    ordered = sorted(variant_dict.keys())
+
+    with codecs.open(outpath, u'w+', encoding='utf-8') as outfile:
+        for key in ordered:
+            originals = u' '.join(variant_dict[key])
+            outfile.write(u'%s : %s' % (key, originals) + u'\n')
