@@ -16,7 +16,7 @@ class DictTests(unittest.TestCase):
         self.temp.write(u'word1\n'.encode(u'utf-8'))
         self.temp.write(u'word2\n'.encode(u'utf-8'))
         self.temp.write(u'αχιλλεύς\n'.encode(u'utf-8')) #Achilles, in NFD
-        self.temp.write(u'αχιλλεύς\n'.encode(u'utf-8')) #Achilles, in NFD
+        self.temp.write(u'αχιλλεύς\n'.encode(u'utf-8')) #Achilles, in NFC
         self.temp.seek(0, 0)
         self.path = os.path.abspath(self.temp.name).decode(u'utf-8')
 
