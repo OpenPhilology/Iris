@@ -909,6 +909,15 @@ class LanguageTests(unittest.TestCase):
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
         self.assertFalse(algorithms.islang(halfandhalf, [algorithms.greek_coptic_range], threshold=0.5000001))
 
+    def test_isgreek(self):
+        """
+        Test the isgreek convenience function.
+        """
+        gk1 = u'Σωκράτης'
+        gk2 = u'Πλάτων'
+        self.assertTrue(algorithms.isgreek(gk1))
+        self.assertTrue(algorithms.isgreek(gk2))
+
     def test_sanitize_strip(self):
         """
         Test that sanitize correctly strips leading and trailing whitespace.

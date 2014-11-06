@@ -593,6 +593,11 @@ def islang(unistr, unicode_blocks, threshold=1.0):
 
     return inlang/len(unistr) >= threshold
 
+@unibarrier
+def isgreek(ustr):
+    return islang(ustr, [greek_coptic_range,extended_greek_diacritics,
+                         greek_and_coptic_diacritics])
+
 def unifilter(string, rangelist):
     filterset = []
     for block in rangelist:
