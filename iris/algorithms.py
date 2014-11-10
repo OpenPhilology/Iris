@@ -186,7 +186,7 @@ def key_for_del_dict_entry(entry):
     Parse a line from a symmetric delete dictionary.
     Returns a tuple of the form (key, list of values).
     """
-    key, val = entry.split(u' : ')
+    key, val = entry.split(u'\t')
     return (key, val.strip())
 
 

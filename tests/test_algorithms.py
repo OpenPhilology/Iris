@@ -1145,8 +1145,8 @@ class SymSpellTests(unittest.TestCase):
         """
         Tests the key_for_del_dict_entry function.
         """
-        single_entry = u'key : val1'
-        multiple_entries = u'key : val1 val2 val3'
+        single_entry = u'key\tval1'
+        multiple_entries = u'key\tval1 val2 val3'
         self.assertEqual((u'key', u'val1'),
                          algorithms.key_for_del_dict_entry(single_entry))
         self.assertEqual((u'key', u'val1 val2 val3'),
@@ -1170,7 +1170,7 @@ class SymSpellTests(unittest.TestCase):
         one item.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write(u'only_entry : some_value')
+        df.write(u'only_entry\tsome_value')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
@@ -1185,8 +1185,8 @@ class SymSpellTests(unittest.TestCase):
         two items.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write(u'first_key : first_value\n')
-        df.write(u'second_key : second_value')
+        df.write(u'first_key\tfirst_value\n')
+        df.write(u'second_key\tsecond_value')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             mm = mmap.mmap(f.fileno(), 0)
@@ -1203,12 +1203,12 @@ class SymSpellTests(unittest.TestCase):
         Test the mmap_bin_search function in a general case.
         """
         df = tempfile.NamedTemporaryFile()
-        df.write('akey : aval\n')
-        df.write('bkey : bval\n')
-        df.write('ckey : cval\n')
-        df.write('dkey : dval\n')
-        df.write('ekey : eval\n')
-        df.write('fkey : fval\n')
+        df.write('akey\taval\n')
+        df.write('bkey\tbval\n')
+        df.write('ckey\tcval\n')
+        df.write('dkey\tdval\n')
+        df.write('ekey\teval\n')
+        df.write('fkey\tfval\n')
         df.seek(0,0)
         with open(os.path.abspath(df.name), 'r+b') as f:
             dpath = os.path.abspath(df.name).decode(u'utf-8')
@@ -1254,12 +1254,12 @@ class SpellCheckTests(unittest.TestCase):
 
     def setUp(self):
         self.temp = tempfile.NamedTemporaryFile()
-        self.temp.write(u'123 : 1234\n')
-        self.temp.write(u'124 : 1234\n')
-        self.temp.write(u'134 : 1234\n')
-        self.temp.write(u'234 : 1234\n')
-        self.temp.write(u'aaaa : aaaaa\n')
-        self.temp.write(u'bbbb : bbbbb\n')
+        self.temp.write(u'123\t1234\n')
+        self.temp.write(u'124\t1234\n')
+        self.temp.write(u'134\t1234\n')
+        self.temp.write(u'234\t1234\n')
+        self.temp.write(u'aaaa\taaaaa\n')
+        self.temp.write(u'bbbb\tbbbbb\n')
         self.temp.seek(0, 0)
 
         self.dic = set()
