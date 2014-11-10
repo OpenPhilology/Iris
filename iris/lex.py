@@ -94,4 +94,4 @@ def make_deldict(outpath, words, depth):
     with codecs.open(outpath, u'w+', encoding='utf-8') as outfile:
         for key in ordered:
             originals = u' '.join(variant_dict[key])
-            outfile.write(u'%s : %s' % (key, originals) + u'\n')
+            outfile.write(u'%s\t%s' % (key, originals) + u'\n')
