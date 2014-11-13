@@ -7,6 +7,7 @@ import os
 import codecs
 import glob
 import algorithms as alg
+from collections import Counter
 
 @alg.unibarrier
 def cleanlines(path, encoding=u'utf-8', normalization=u'NFD'):
@@ -34,6 +35,19 @@ def cleanwords(path, encoding=u'utf-8', normalization=u'NFD'):
                 if clean != u'':
                     words.append(clean)
     return words
+    
+
+@alg.unibarrier
+def uniquewords_with_freq(path, encoding=u'utf-8', normalization=u'NFD'):
+    """
+    Read in every word from a file as separated by lines and spaces.
+    Return a counter (behaves like a dictionary) of unique words
+    along with the number of times they occurred.
+    """
+    words = cleanwords(path, encoding=encoding, normalization=normalization)
+    freq = Counter(words)
+    return freq
+        
 
 @alg.unibarrier
 def cleanuniquewords(path, encoding=u'utf-8', normalization=u'NFD'):
@@ -64,7 +78,7 @@ def unique_words_from_files(dirpath, encoding=u'utf-8', normalization=u'NFD'):
 	All file in the given directory will be parsed.
 	"""
 	return set(words_from_files(dirpath, encoding=encoding, normalization=normalization))
-
+        
 @alg.unibarrier
 def make_dict(outpath, iterable, encoding=u'utf-8'):
 	"""
@@ -95,3 +109,19 @@ def make_deldict(outpath, words, depth):
         for key in ordered:
             originals = u' '.join(variant_dict[key])
             outfile.write(u'%s\t%s' % (key, originals) + u'\n')
+
+            
+            
+
+
+if __name__ == '__main__':
+    print 'on'
+    import tempfile
+    temp = tempfile.NamedTemporaryFile()
+    temp.write('a a a a b b c c c b b b b d \n foobar foobar')
+    temp.seek(0,0) 
+    f = uniquewords_with_freq(temp.name.decode('utf-8'))
+    print f
+    print f['a']
+    print f['b']
+    print f['foobar']
