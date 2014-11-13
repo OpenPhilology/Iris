@@ -16,7 +16,6 @@ import timeit
 import subprocess
 import math
 import tempfile
-from kitchen.text.converters import to_unicode, to_bytes
 from lxml import etree
 
 
