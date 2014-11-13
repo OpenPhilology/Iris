@@ -106,6 +106,19 @@ def sym_suggest(ustr, dic, delete_dic, depth, ret_count=0):
 @unibarrier
 def parse_del_dict_entry(entry):
     return [] if entry is None else [word.strip() for word in entry.split(u' ')]
+
+@unibarrier
+def suggestions(ustr, sugs):
+    """
+    Call mapped_sym_suggest, and return the suggestions as a
+    sorted list.
+    """
+    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x))
+    
+    return sugs
+    
+    
+
     
 
 @unibarrier
@@ -646,16 +659,8 @@ def list_to_uni(l, encoding=u'utf-8'):
     result += u']'
     return result.encode(encoding)
 
-if __name__ == '__main__':
-    import sys
-    #full_edit_distance('ab', 'ac')
-    def f(c1, c2):
-        print 'the inner func'
-        return 1
+#if __name__ == '__main__':
 
-    #print full_edit_distance('ab', 'ac', ins_func=f, del_func=f, sub_func=f)
-    print full_edit_distance('ab', 'ac')
-    print _native_full_edit_distance('ab', 'ac')
+    
 
-
-
+ 
