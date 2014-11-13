@@ -107,18 +107,19 @@ def parse_del_dict_entry(entry):
     return [] if entry is None else [word.strip() for word in entry.split(u' ')]
 
 @unibarrier
-def suggestions(ustr, sugs):
+def suggestions(ustr, sugs, freq=None):
     """
     Call mapped_sym_suggest, and return the suggestions as a
-    sorted list.
+    sorted list. Python's built in sort is stable, so we can
+    simply sort repeatedly, from least important aspect to
+    most important.
     """
-    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x))
+    sugs = sorted(sugs) #Alphabetic sort
+    if freq is not None:
+        sugs = sorted(sorted(sugs), key=lambda x: freq[x]) # By frequency
+    sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x)) # By edit distance
     
     return sugs
-    
-    
-
-    
 
 @unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
@@ -659,7 +660,3 @@ def list_to_uni(l, encoding=u'utf-8'):
     return result.encode(encoding)
 
 #if __name__ == '__main__':
-
-    
-
- 

@@ -1352,13 +1352,15 @@ class SpellCheckTests(unittest.TestCase):
         Test the suggestions function.
         """
         orig = u'aaaa'
-        s1 = u'aaab' #edit distance 1
+        s0 = u'aaaa' #match
+        s1 = u'baaa' #edit distance 1
+        s1a = u'caaa' #edit distance 1; after s1 by alphabetical order
         s2 = u'aabb' #edit distance 2
+        s2a = u'aacc' #edit distance 2; after s2 by alphabetical order
         s3 = u'cccc' #edit distance 4
-        expected = [s1, s2, s3]
-        all_orderings = itertools.permutations([s1, s2, s3])
-        for ordering in all_orderings:
-            self.assertEqual(expected, algorithms.suggestions(orig, ordering))
+        s4 = u'ccccc' #edit distance 5
+        expected = [s0, s1, s1a, s2, s2a, s3, s4, s4] # s4 inserted twice to increase frequency
+        self.assertEqual(expected, algorithms.suggestions(orig, [s4, s4, s2, s2a, s0, s1, s1a, s3]))
         
 
 if __name__ == '__main__':
