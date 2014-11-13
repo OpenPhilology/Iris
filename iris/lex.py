@@ -109,19 +109,3 @@ def make_deldict(outpath, words, depth):
         for key in ordered:
             originals = u' '.join(variant_dict[key])
             outfile.write(u'%s\t%s' % (key, originals) + u'\n')
-
-            
-            
-
-
-if __name__ == '__main__':
-    print 'on'
-    import tempfile
-    temp = tempfile.NamedTemporaryFile()
-    temp.write('a a a a b b c c c b b b b d \n foobar foobar')
-    temp.seek(0,0) 
-    f = uniquewords_with_freq(temp.name.decode('utf-8'))
-    print f
-    print f['a']
-    print f['b']
-    print f['foobar']
