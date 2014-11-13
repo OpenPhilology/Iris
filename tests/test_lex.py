@@ -143,10 +143,10 @@ class DictTests(unittest.TestCase):
         words = [u'aaa', u'bbb', u'ccc', u'ddd']
         lex.make_deldict(outfile.name, words, 1)
         lines = lex.cleanlines(outfile.name)
-        self.assertEqual(u'aa : aaa', lines[0])
-        self.assertEqual(u'bb : bbb', lines[1])
-        self.assertEqual(u'cc : ccc', lines[2])
-        self.assertEqual(u'dd : ddd', lines[3])
+        self.assertEqual(u'aa\taaa', lines[0])
+        self.assertEqual(u'bb\tbbb', lines[1])
+        self.assertEqual(u'cc\tccc', lines[2])
+        self.assertEqual(u'dd\tddd', lines[3])
         outfile.close()
 
 
