@@ -42,7 +42,7 @@ def rgb_to_gray(doc, method=u'rgb_to_gray'):
     """
     Converts an arbitrary bit depth image to grayscale and writes it back
     appending a suffix.
-    
+
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
@@ -60,7 +60,7 @@ def binarize(doc, method=u'binarize', algorithm=u'sauvola', thresh=10,
     """
     Binarizes an input document utilizing ether Sauvola or Otsu
     thresholding. Expects grayscale images as input.
-    
+
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
@@ -97,7 +97,7 @@ def dewarp(doc, method=u'dewarp'):
     """
     Removes perspective distortion (as commonly exhibited by overhead scans)
     from an 1bpp input image.
-    
+
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
@@ -114,7 +114,7 @@ def dewarp(doc, method=u'dewarp'):
 def deskew(doc, method=u'deskew'):
     """
     Removes skew (rotational distortion) from an 1bpp input image.
-    
+
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
@@ -134,7 +134,7 @@ def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
     rigaudon. It requires a working spell checking for the input document's
     language; otherwise all matched bboxes will be bunched together without any
     scoring.
-    
+
     Args:
         docs [(id, path), ...]: A list of storage module tupels that will be
         merged into a single output document.
@@ -155,13 +155,13 @@ def blend_hocr(docs, language=u'',  method=u'blend_hocr'):
 def ocr_tesseract(doc, method=u'ocr_tesseract', languages=None):
     """
     Runs tesseract on an input document.
-    
+
     Args:
         doc (unicode): The filename of the input document.
         id (unicode): The unique id underneath all files are situated.
         method (unicode): The suffix string appended to all output files.
         languages (list of unicode): A list of languages for the tesseract language model.
-        
+
     Returns:
         unicode: Path of the output file.
     """
