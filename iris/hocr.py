@@ -12,6 +12,8 @@ PAGES = u"//*[@class='ocr_page' and @title]"
 LINES = u"//*[@class='ocr_line' and @title]"
 WORDS = u"//*[@class='ocr_word' and @title]" #Returns a list
 XWORDS = u"//*[@class='ocrx_word' and @title]" #Returns a list
+UNCHECKED_WORDS = u"//*[@class='ocr_word' and @title and not(child::*)]" #Returns a list
+UNCHECKED_XWORDS = u"//*[@class='ocrx_word' and @title and not(child::*)]" #Returns a list
 
 
 class HocrContext(object):
