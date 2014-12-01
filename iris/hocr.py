@@ -80,8 +80,8 @@ def extract_suggestions(context, wordxpath):
 def insert_suggestions(con, wordxpath, suggestions):
     """
     Add a hocr alternative tag to the specified word
-    in the specified document. We assume "correctness" if the hocr
-    in that the specified word is encoded as either:
+    in the specified document. We assume "correctness" 
+    in that the specified word should be encoded as either:
     a. the text of the element that wordxpath refers to, or
     b. that element has no text, but rather a span element of class
        "alternatives", which contains ins tags representing each
