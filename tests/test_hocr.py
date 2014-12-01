@@ -11,7 +11,7 @@ class HocrTests(unittest.TestCase):
     """
 
     def setUp(self):
-        self.temp = tempfile.TemporaryFile()
+        self.temp = tempfile.NamedTemporaryFile()
 
     def tearDown(self):
         self.temp.close()
@@ -80,6 +80,91 @@ class HocrTests(unittest.TestCase):
                                                           u"//*[@class='c2' and @title]",
                                                           u"//*[@class='c3' and @title]"])
         self.assertEqual(expected, actual)
+
+    def test_extract_suggestions(self):
+        """
+        Test the extract_suggestions function.
+        """
+        xml = u"""
+                <root>
+                  <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>
+                    <span class="alternatives">
+                      <ins class="alt" title="nlp 0.9">already_exists</ins>
+                      <ins class="alt" title="nlp 0.8">also_already_exists</ins>
+                    </span>
+                  </span>
+                </root>
+                """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        with hocr.HocrContext(self.temp.name) as con:
+            onlyword, xpath = hocr.extract_words(con)[0]
+
+            self.assertEqual([(u'already_exists', 0.9), (u'also_already_exists', 0.8)], hocr.extract_suggestions(con, xpath))
+
+
+    def test_insert_suggestions(self):
+        """
+        Test the insert_suggestions function.
+        """
+        xml = u"""
+                <root>
+                <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>theword</span>
+                </root>
+                """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        with hocr.HocrContext(self.temp.name) as con:
+            onlyword, xpath = hocr.extract_words(con)[0]
+            suggestions = [(u'foo', 0.1), (u'bar', 0.2), (u'qux', 0.3), (u'lol', 0.4)]
+            hocr.insert_suggestions(con, xpath, suggestions)
+
+            self.assertEqual(suggestions, hocr.extract_suggestions(con, xpath))
+
+    def test_insert_suggestions_preexisting(self):
+        """
+        Test the insert_suggestions function.
+        """
+        xml = u"""
+                <root>
+                  <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>
+                    <span class="alternatives">
+                      <ins class="alt" title="nlp 0.9">already_exists</ins>
+                      <ins class="alt" title="nlp 0.8">also_already_exists</ins>
+                    </span>
+                  </span>
+                </root>
+                """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        with hocr.HocrContext(self.temp.name) as con:
+            onlyword, xpath = hocr.extract_words(con)[0]
+            suggestions = [(u'foo', 0.1), (u'bar', 0.2), (u'qux', 0.3), (u'lol', 0.4)]
+            hocr.insert_suggestions(con, xpath, suggestions)
+
+            expected = [(u'already_exists', 0.9), (u'also_already_exists', 0.8),
+                                                  (u'foo', 0.1), (u'bar', 0.2),
+                                                  (u'qux', 0.3), (u'lol', 0.4)]
+            self.assertEqual(expected, hocr.extract_suggestions(con, xpath))
+
+
+    def test_insert_suggestion(self):
+        """
+        Test the insert_suggestion function.
+        """
+        xml = u"""
+                <root>
+                <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>theword</span>
+                </root>
+                """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        with hocr.HocrContext(self.temp.name) as con:
+            onlyword, xpath = hocr.extract_words(con)[0]
+            hocr.insert_suggestion(con, xpath, u'foobar', 0.5)
+
+
+
 
 
 if __name__ == '__main__':

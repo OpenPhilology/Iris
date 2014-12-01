@@ -10,8 +10,8 @@ from PIL import Image, ImageDraw
 ALL_BBOXES = u"//*[@title]"
 PAGES = u"//*[@class='ocr_page' and @title]"
 LINES = u"//*[@class='ocr_line' and @title]"
-WORDS = u"//*[@class='ocr_word' and @title]"
-XWORDS = u"//*[@class='ocrx_word' and @title]"
+WORDS = u"//*[@class='ocr_word' and @title]" #Returns a list
+XWORDS = u"//*[@class='ocrx_word' and @title]" #Returns a list
 
 
 class HocrContext(object):
@@ -42,7 +42,7 @@ def extract_words(context):
     # words = [(e.text, context.getpath(e)) for e in context.xpath(WORDS)]
     words = []
     for e in context.xpath(WORDS):
-        word = (to_unicode(e.text), context.getpath(e))
+        word = (to_unicode(e.text), context.getpath(e).decode(u'utf-8'))
         words.append(word)
     return words
 
@@ -65,6 +65,47 @@ def extract_hocr_tokens(hocr_file):
             del element.getparent()[0]
     del context
     return words
+
+@algorithms.unibarrier
+def extract_suggestions(context, wordxpath):
+    """
+    Extract the suggestions for the given word identified by wordxpath.
+    Returns a list of tuples of the form (text_of_suggestion, nlpnum).
+    """
+    word_element = context.xpath(wordxpath)[0]
+    suggestion_tags = word_element.getchildren()[0].getchildren()
+    return [(algorithms.sanitize(tag.text), float(tag.attrib[u'title'][4:])) for tag in suggestion_tags]
+
+@algorithms.unibarrier
+def insert_suggestions(con, wordxpath, suggestions):
+    """
+    Add a hocr alternative tag to the specified word
+    in the specified document. We assume "correctness" if the hocr
+    in that the specified word is encoded as either:
+    a. the text of the element that wordxpath refers to, or
+    b. that element has no text, but rather a span element of class
+       "alternatives", which contains ins tags representing each
+       suggestion.
+    Suggestions is a list of tuples of the form
+    (suggested unicode word, nlpnum).
+    """
+    word_span_element = con.xpath(wordxpath)[0] #The span tag representing the hocr word
+    suggestion_span = None
+    if algorithms.sanitize(word_span_element.text) != u'':
+        oldtext = word_span_element.text
+        word_span_element.text = u''
+        suggestion_span = etree.Element(u'span', {u'class':u'alternatives'})
+        word_span_element.append(suggestion_span)
+    else:
+        suggestion_span = word_span_element.getchildren()[0]
+    for s in suggestions:
+        ins = etree.Element(u'ins', {u'class':u'alt', u'title':u'nlp '+unicode(s[1])})
+        ins.text = s[0]
+        suggestion_span.append(ins)
+
+@algorithms.unibarrier
+def insert_suggestion(con, wordxpath, suggestion, nlpnum):
+    insert_suggestions(con, wordxpath, [(suggestion, nlpnum)])
 
 def extract_bboxes(hocr_file, xpaths=[ALL_BBOXES]):
     """
