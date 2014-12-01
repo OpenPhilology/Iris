@@ -164,6 +164,21 @@ class HocrTests(unittest.TestCase):
             hocr.insert_suggestion(con, xpath, u'foobar', 0.5)
 
 
+    def test_unchecked_words_xpath(self):
+        xml = u"""
+                <root>
+                  <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>word</span>
+                  <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'><p>something</p></span>
+                  <span class='ocrx_word' id='some_word' title='bbox 1 2 3 4'>word</span>
+                  <span class='ocrx_word' id='some_word' title='bbox 1 2 3 4'><p>something</p></span>
+                </root>
+                """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        with hocr.HocrContext(self.temp.name) as con:
+            spans = hocr.extract_words(con)
+            self.assertEqual(u'word', con.xpath(hocr.UNCHECKED_WORDS)[0].text)
+            self.assertEqual(u'word', con.xpath(hocr.UNCHECKED_XWORDS)[0].text)
 
 
 
