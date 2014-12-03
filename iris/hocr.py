@@ -127,6 +127,23 @@ def spellcheck_hocr(con, xpath, dic, del_dic_path, depth):
         flatsugs = algorithms.suggestions(cw, [item for sset in sugs for item in sset])
         insert_suggestions(con, con.getpath(e).decode(u'utf-8'), [(s, 0.9) for s in flatsugs])
 
+@algorithms.unibarrier
+def spellcheck_hocr_with_filedict(con, xpath, dic_path, del_dic_path, depth):
+    """
+    Spell check the given hocr document and insert the suggested
+    corrections. dic is a set of correct words, del_dic_path
+    is the corresponding deletion dictionary, and depth is the
+    corresponding depth. xpath is an xpath expression which evaluates to
+    a list of ocr_word or ocr_xword elements to be checked.
+    """
+    # xpath = hocr.UNCHECKED_WORDS if irisconfig.OLD_TESSERACT else hocr.UNCHECKED_XWORDS
+    elements = [e for e in con.xpath(xpath)]
+    for e in elements:
+        cw = algorithms.sanitize(e.text)
+        sugs = algorithms.mapped_sym_suggest_with_filedict(cw, del_dic_path, dic_path, depth).values()
+        flatsugs = algorithms.suggestions(cw, [item for sset in sugs for item in sset])
+        insert_suggestions(con, con.getpath(e).decode(u'utf-8'), [(s, 0.9) for s in flatsugs])
+
 
 
 def extract_bboxes(hocr_file, xpaths=[ALL_BBOXES]):
