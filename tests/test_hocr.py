@@ -3,6 +3,7 @@ import unittest
 import re
 import tempfile
 
+from lxml import etree
 from iris import hocr
 
 class HocrTests(unittest.TestCase):
@@ -11,6 +12,7 @@ class HocrTests(unittest.TestCase):
     """
 
     def setUp(self):
+        self.maxDiff = None
         self.temp = tempfile.NamedTemporaryFile()
 
     def tearDown(self):
@@ -179,6 +181,58 @@ class HocrTests(unittest.TestCase):
             spans = hocr.extract_words(con)
             self.assertEqual(u'word', con.xpath(hocr.UNCHECKED_WORDS)[0].text)
             self.assertEqual(u'word', con.xpath(hocr.UNCHECKED_XWORDS)[0].text)
+
+    def test_check_hocr_all(self):
+        """
+        Test the spellcheck hocr function with xpath that will
+        correct all words in the document.
+        """
+        xml = u"""
+               <root>
+                 <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>aaa</span>
+                 <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>bbb</span>
+                 <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>ccc</span>
+               </root>
+               """
+        self.temp.write(xml)
+        self.temp.seek(0,0)
+        dic = {u'aaaa', u'bbbb', u'cccc'}
+        del_dic = tempfile.NamedTemporaryFile()
+        # dic.write(u'aaaa\n')
+        # dic.write(u'bbbb\n')
+        # dic.write(u'cccc\n')
+        del_dic.write(u'aaa\taaaa\n')
+        del_dic.write(u'bbb\tbbbb\n')
+        del_dic.write(u'ccc\tcccc\n')
+        # dic.seek(0,0)
+        del_dic.seek(0,0)
+        expected = u"""
+                    <root>
+                      <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>
+                        <span class="alternatives">
+                          <ins class="alt" title="nlp 0.9">aaaa</ins>
+                        </span>
+                      </span>
+                      <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>
+                        <span class="alternatives">
+                          <ins class="alt" title="nlp 0.9">bbbb</ins>
+                        </span>
+                      </span>
+                      <span class='ocr_word' id='some_word' title='bbox 1 2 3 4'>
+                        <span class="alternatives">
+                          <ins class="alt" title="nlp 0.9">cccc</ins>
+                        </span>
+                      </span>
+                    </root>
+                    """
+        with hocr.HocrContext(self.temp.name) as con:
+            hocr.spellcheck_hocr(con, hocr.UNCHECKED_WORDS, dic, del_dic.name.decode(u'utf-8'), 1)
+            actual_string = etree.tostring(con.getroot(), pretty_print=True).replace(u'\n', u'').replace(u'\t', u'').replace(u' ', u'')
+            expected_string = etree.tostring(etree.XML(expected), pretty_print=True).replace(u'\n', u'').replace(u'\t', u'').replace(u' ', u'')
+            print actual_string
+            print expected_string
+            self.assertEqual(expected_string, actual_string)
+
 
 
 
