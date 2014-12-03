@@ -111,13 +111,14 @@ def suggestions(ustr, sugs, freq=None):
     Call mapped_sym_suggest, and return the suggestions as a
     sorted list. Python's built in sort is stable, so we can
     simply sort repeatedly, from least important aspect to
-    most important.
+    most important. Freq is a dictionary of the from
+    {word (unicode) : freq (integer)}.
     """
     sugs = sorted(sugs) #Alphabetic sort
     if freq is not None:
         sugs = sorted(sorted(sugs), key=lambda x: freq[x]) # By frequency
     sugs = sorted(sugs, key=lambda x: edit_distance(ustr, x)) # By edit distance
-    
+
     return sugs
 
 @unibarrier
@@ -211,7 +212,7 @@ def key_for_single_word(entry):
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
- 
+
 # TODO Implement doubling-length backward search to make line_buffer_size
 # irrelevant.
 @unibarrier
@@ -345,7 +346,7 @@ def native_semi_global_matrix(str1, str2, substitutionscore, insertscore,
 def native_full_edit_distance(str1, str2, substitutionscore=1, insertscore=1,
                               deletescore=1, charmatrix={},
                               alignment_type='global'):
-    
+
     matrix, steps = full_edit_distance(str1, str2, substitutionscore=substitutionscore,
                        insertscore=insertscore, deletescore=deletescore,
                        charmatrix=charmatrix, alignment_type=alignment_type)
