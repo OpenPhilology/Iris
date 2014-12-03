@@ -126,7 +126,7 @@ def in_file_dictionary(ustr, dictpath, line_buffer_size=200):
     """
     Check if the given word is in the given dictionary.
     """
-    return mmap_bin_search(ustr, dictpath, key_for_single_word, line_buffer_size=line_buffer_size)
+    return mmap_bin_search(ustr, dictpath, key_for_single_word, line_buffer_size=line_buffer_size) is not None
 
 @unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
@@ -148,6 +148,41 @@ def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
         inserts = set(w for w in word_for_ustr)  # get the words reachable by adding to ustr.
     for s in dels:
         if s in dic:
+            deletes.add(s) # Add a word reachable by deleting from ustr.
+
+        line_for_s = parse_del_dict_entry(mmap_bin_search(s, del_dic_path))
+        if line_for_s is not None:
+            # Get the words reachable by deleting from originals, adding to them.
+            # Note that this is NOT the same as 'Levenshtein' substitution.
+            for sug in line_for_s:
+                distance = edit_distance(sug, ustr)
+                if distance == depth:
+                    subs.add(sug)
+                elif distance > depth:
+                    int_and_dels.add(sug)
+
+    return {u'dels':deletes, u'ins':inserts, u'subs':subs, u'ins+dels':int_and_dels}
+
+@unibarrier
+def mapped_sym_suggest_with_filedict(ustr, del_dic_path, dic_path, depth, ret_count=0):
+    """
+    Generate a list of spelling suggestions using the memory mapped
+    dictionary search/symmetric delete algorithm. Return only
+    suggestions at the specified depth, not up to and including that
+    depth.
+    """
+    deletes = set()
+    inserts = set()
+    int_and_dels = set()
+    subs = set()
+
+    dels = strings_by_deletion(ustr, depth)
+    ustr_entry = mmap_bin_search(ustr, del_dic_path)
+    word_for_ustr = parse_del_dict_entry(ustr_entry)
+    if word_for_ustr is not None:
+        inserts = set(w for w in word_for_ustr)  # get the words reachable by adding to ustr.
+    for s in dels:
+        if in_file_dictionary(s, dic_path):
             deletes.add(s) # Add a word reachable by deleting from ustr.
 
         line_for_s = parse_del_dict_entry(mmap_bin_search(s, del_dic_path))

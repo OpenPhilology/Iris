@@ -1270,6 +1270,8 @@ class SymSpellTests(unittest.TestCase):
             self.assertTrue(algorithms.in_file_dictionary(u'bval', dpath))
             self.assertTrue(algorithms.in_file_dictionary(u'cval', dpath))
             self.assertTrue(algorithms.in_file_dictionary(u'dval', dpath))
+            self.assertFalse(algorithms.in_file_dictionary(u'notpresent', dpath))
+            self.assertFalse(algorithms.in_file_dictionary(u'', dpath))
 
 
 
@@ -1291,8 +1293,15 @@ class SpellCheckTests(unittest.TestCase):
         self.dic.add(u'bbbbb')
         self.dic.add(u'1234')
 
+        self.tempworddict = tempfile.NamedTemporaryFile()
+        self.tempworddict.write('aaaaa\n')
+        self.tempworddict.write('bbbbb\n')
+        self.tempworddict.write('1234\n')
+        self.tempworddict.seek(0,0)
+
     def tearDown(self):
         self.temp.close()
+        self.tempworddict.close()
 
     def test_suggest_empty_string_1(self):
         """
@@ -1358,6 +1367,81 @@ class SpellCheckTests(unittest.TestCase):
         result_b = algorithms.mapped_sym_suggest(u'Xbbbb',
                                                 self.temp.name.decode('utf-8'),
                                                 self.dic, 1)
+
+        self.assertEqual(len(result_a[u'ins']), 0)
+        self.assertEqual(len(result_a[u'dels']), 0)
+        self.assertEqual(len(result_a[u'subs']), 1)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
+
+        self.assertEqual(len(result_b[u'ins']), 0)
+        self.assertEqual(len(result_b[u'dels']), 0)
+        self.assertEqual(len(result_b[u'subs']), 1)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
+
+    def test_suggest_empty_string_1_with_filedict(self):
+        """
+        Test the spelling suggestor with an empty input string
+        """
+        result = algorithms.mapped_sym_suggest_with_filedict(u'',
+                                                self.temp.name.decode('utf-8'),
+                                                self.dic, 1)
+        self.assertEqual(len(result[u'ins']), 0)
+        self.assertEqual(len(result[u'dels']), 0)
+        self.assertEqual(len(result[u'subs']), 0)
+        self.assertEqual(len(result[u'ins+dels']), 0)
+
+
+    def test_suggest_1_insert_with_filedict(self):
+        """
+        Test the spellchecker in the case of a single insert.
+        """
+        result_a = algorithms.mapped_sym_suggest_with_filedict(u'aaaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
+        result_b = algorithms.mapped_sym_suggest_with_filedict(u'bbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
+        self.assertEqual(len(result_a[u'ins']), 1)
+        self.assertEqual(len(result_a[u'dels']), 0)
+        self.assertEqual(len(result_a[u'subs']), 0)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
+        self.assertEqual(len(result_b[u'ins']), 1)
+        self.assertEqual(len(result_b[u'dels']), 0)
+        self.assertEqual(len(result_b[u'subs']), 0)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
+
+    def test_suggest_1_delete_with_filedict(self):
+        """
+        Test the spellchecker in the case of a single delete.
+        """
+        result_a = algorithms.mapped_sym_suggest_with_filedict(u'aaXaaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
+        result_b = algorithms.mapped_sym_suggest_with_filedict(u'Xbbbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
+        
+        self.assertEqual(len(result_a[u'ins']), 0)
+        self.assertEqual(len(result_a[u'dels']), 1)
+        self.assertEqual(len(result_a[u'subs']), 0)
+        self.assertEqual(len(result_a[u'ins+dels']), 0)
+
+        self.assertEqual(len(result_b[u'ins']), 0)
+        self.assertEqual(len(result_b[u'dels']), 1)
+        self.assertEqual(len(result_b[u'subs']), 0)
+        self.assertEqual(len(result_b[u'ins+dels']), 0)
+
+
+    def test_suggest_1_substitute_with_filedict(self):
+        """
+        Test the spellchecker in the case of a single substitution.
+        """
+        result_a = algorithms.mapped_sym_suggest_with_filedict(u'aaXaa',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
+        result_b = algorithms.mapped_sym_suggest_with_filedict(u'Xbbbb',
+                                                self.temp.name.decode('utf-8'),
+                                                self.tempworddict.name.decode(u'utf-8'), 1)
 
         self.assertEqual(len(result_a[u'ins']), 0)
         self.assertEqual(len(result_a[u'dels']), 0)
