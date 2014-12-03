@@ -122,6 +122,13 @@ def suggestions(ustr, sugs, freq=None):
     return sugs
 
 @unibarrier
+def in_file_dictionary(ustr, dictpath, line_buffer_size=200):
+    """
+    Check if the given word is in the given dictionary.
+    """
+    return mmap_bin_search(ustr, dictpath, key_for_single_word, line_buffer_size=line_buffer_size)
+
+@unibarrier
 def mapped_sym_suggest(ustr, del_dic_path, dic, depth, ret_count=0):
     """
     Generate a list of spelling suggestions using the memory mapped

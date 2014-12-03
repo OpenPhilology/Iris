@@ -1250,6 +1250,30 @@ class SymSpellTests(unittest.TestCase):
             self.assertEqual(ex_c, algorithms.mmap_bin_search(u'cval', dpath, entryparser_fn=algorithms.key_for_single_word))
             self.assertEqual(ex_d, algorithms.mmap_bin_search(u'dval', dpath, entryparser_fn=algorithms.key_for_single_word))
 
+    def test_in_file_dictionary(self):
+        """
+        Test the in_file_dictionary function.
+        """
+        df = tempfile.NamedTemporaryFile()
+        df.write('aval\n')
+        df.write('bval\n')
+        df.write('cval\n')
+        df.write('dval\n')
+        df.seek(0,0)
+        with open(os.path.abspath(df.name), 'r+b') as f:
+            dpath = os.path.abspath(df.name).decode(u'utf-8')
+            ex_a = u'aval'
+            ex_b = u'bval'
+            ex_c = u'cval'
+            ex_d = u'dval'
+            self.assertTrue(algorithms.in_file_dictionary(u'aval', dpath))
+            self.assertTrue(algorithms.in_file_dictionary(u'bval', dpath))
+            self.assertTrue(algorithms.in_file_dictionary(u'cval', dpath))
+            self.assertTrue(algorithms.in_file_dictionary(u'dval', dpath))
+
+
+
+
 class SpellCheckTests(unittest.TestCase):
 
     def setUp(self):
@@ -1359,6 +1383,6 @@ class SpellCheckTests(unittest.TestCase):
         s4 = u'ccccc' #edit distance 5
         expected = [s0, s1, s1a, s2, s2a, s3, s4, s4] # s4 inserted twice to increase frequency
         self.assertEqual(expected, algorithms.suggestions(orig, [s4, s4, s2, s2a, s0, s1, s1a, s3]))
-        
+
 if __name__ == '__main__':
     unittest.main()
